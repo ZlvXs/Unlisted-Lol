@@ -1,4 +1,89 @@
---Made By Zlv, Enjoy <3
+--- Made By Zlv <3
+
+local UserInputService = game:GetService("UserInputService")
+local Heartbeat = game:GetService("RunService").Heartbeat
+local walkSpeed = 16
+local plrs = game:GetService'Players'
+local Heartbeat = game:GetService("RunService").Heartbeat
+local dupping = false
+local plr = plrs.LocalPlayer
+local mouse = plr:GetMouse()
+local rep = game:GetService'ReplicatedStorage'
+local uis = game:GetService'UserInputService'
+local ts = game:GetService'TweenService'
+local rs = game:GetService'RunService'
+
+local Player = game:GetService("Players").LocalPlayer
+local Mouse = Player:GetMouse()
+
+local function Notify(title,text,duration)
+    game:GetService'StarterGui':SetCore('SendNotification',{
+        Title = tostring(title),
+        Text = tostring(text),
+        Duration = tonumber(duration),
+    })
+end
+
+local function GetChar()
+    local Char = Player.Character or Player.CharacterAdded:Wait()
+    return Char
+end
+
+local function AddCd(tool,Cd)
+    local cd = Instance.new('IntValue',tool)
+    cd.Name = 'ClientCD'
+    game.Debris:AddItem(cd,Cd)
+end
+local function Shoot(firstPos,nextPos,Revolver)
+    if Revolver:FindFirstChild'Barrel' and Revolver.Barrel:FindFirstChild'Attachment' then
+        if Revolver.Barrel.Attachment:FindFirstChild'Sound' then
+            local SoundClone = Revolver.Barrel.Attachment.Sound:Clone()
+            SoundClone.Name = 'Uncopy'
+            SoundClone.Parent = Revolver.Barrel.Attachment
+            SoundClone:Play()
+            game.Debris:AddItem(SoundClone, 1)
+        end
+        local FilterTable = {}
+        table.insert(FilterTable, plr.Character)
+        table.insert(FilterTable, game.Workspace['Target Filter'])
+        for _, v in pairs(game.Workspace:GetDescendants()) do
+            if v.ClassName == 'Accessory' then
+                table.insert(FilterTable, v)
+            end
+        end
+        local a_1, a_2, a_3 = game.Workspace:FindPartOnRayWithIgnoreList(Ray.new(firstPos, (nextPos - firstPos).Unit * 100), FilterTable)
+        local BulletCl = rep['Revolver Bullet']:Clone()
+        game.Debris:AddItem(BulletCl, 1)
+        BulletCl.Parent = game.Workspace['Target Filter']
+        local mg = (firstPos - a_2).Magnitude
+        BulletCl.Size = Vector3.new(0.2, 0.2, mg)
+        BulletCl.CFrame = CFrame.new(firstPos, nextPos) * CFrame.new(0, 0, -mg / 2)
+        ts:Create(BulletCl, TweenInfo.new(0.4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+            Size = Vector3.new(0.06, 0.06, mg), 
+            Transparency = 1
+        }):Play()
+        if a_1 then
+            local expPart = Instance.new'Part'
+            game.Debris:AddItem(expPart, 2)
+            expPart.Name = 'Exploding Neon Part'
+            expPart.Anchored = true
+            expPart.CanCollide = true
+            expPart.Shape = 'Ball'
+            expPart.Material = Enum.Material.Neon
+            expPart.BrickColor = BulletCl.BrickColor
+            expPart.Size = Vector3.new(0.1, 0.1, 0.1)
+            expPart.Parent = game.Workspace['Target Filter']
+            expPart.Position = a_2
+            ts:Create(expPart, TweenInfo.new(0.3, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+                Size = Vector3.new(2, 2, 2), 
+                Transparency = 1
+            }):Play()
+            if Revolver:FindFirstChild'DamageRemote' and a_1.Parent:FindFirstChild'Humanoid' then
+                Revolver.DamageRemote:FireServer(a_1.Parent.Humanoid)
+            end
+        end
+    end
+end
     
 local CoreGui = game:GetService("StarterGui")
 local Players = game:GetService("Players")
@@ -16,7 +101,7 @@ local Window = Library:Create("Hitbox Expander")
 
 local HomeTab = Window:Tab("Home","rbxassetid://12296135476")
 
-HomeTab:Section("Made By Zlv, Enjoy! <3")
+HomeTab:Section(" By Zlv <3")
 HomeTab:Section("Hitbox")
 
 HomeTab:Slider("Hitbox Size (Slider)", 0,300, function(value)
